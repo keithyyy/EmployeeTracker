@@ -1,0 +1,29 @@
+{
+  "name": "employeetracker",
+  "version": "1.0.0",
+  "description": "Employee Tracker to manage company structure",
+  "main": "server.js",
+  "dependencies": {
+    "inquirer": "^7.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keithyyy/EmployeeTracker.git"
+  },
+  "keywords": [
+    "mysql",
+    "node",
+    "inquirer"
+  ],
+  "author": "Keith Crooc",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keithyyy/EmployeeTracker/issues"
+  },
+  "homepage": "https://github.com/keithyyy/EmployeeTracker#readme"
+}
