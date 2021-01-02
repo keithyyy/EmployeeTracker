@@ -34,4 +34,35 @@ const startApp = () => {
                 "Quit"
             ]
         })
+        .then((answer) => {
+            switch (answer.menu) {
+                case "View All Employees":
+                    viewAllEmployees();
+                    break;
+
+                case "View Employees by Department":
+                    viewByDeparment();
+                    break;
+
+                case "View Employees by Manager":
+                    viewByManager();
+                    break;
+
+                case "Add Employee":
+                    addEmployee();
+                    break;
+
+                case "Remove Employee":
+                    removeEmployee();
+                    break;
+
+                case "Edit Employee":
+                    editEmployee();
+                    break;
+                
+                case "Quit":
+                    console.log("See you later!");
+                    connection.end();
+            }
+        })
 }
