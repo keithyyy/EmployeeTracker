@@ -30,7 +30,7 @@ const startApp = () => {
                 "View Employees by Manager",
                 "Add Employee",
                 "Remove Employee",
-                "Edit Employee",
+                "Edit Employee Role",
                 "Quit"
             ]
         })
@@ -56,8 +56,8 @@ const startApp = () => {
                     removeEmployee();
                     break;
 
-                case "Edit Employee":
-                    editEmployee();
+                case "Edit Employee Role":
+                    editEmployeeRole();
                     break;
                 
                 case "Quit":
@@ -116,4 +116,85 @@ const viewByManager = () => {
         console.log("What's next?");
         startApp();
     })
+}
+
+const editEmployeeRole = () => {
+    let query = "SELECT employee.id, employee.first_name AS employeeFirst, employee.last_name AS employeeLast, employee.role_id, role.title FROM role INNER JOIN employee ON employee.role_id = role.id";
+
+    
+    
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+    
+        connection.query("SELECT * FROM companyStructure_DB.role; ", (error, response) => {
+            if (err) throw err;
+            inquirer.prompt([
+                {
+                name: "employeePick",
+                type: "rawlist",
+                message: "Which employee would you like to edit?",
+                choices: () => {
+                    let choiceArr = [];
+                    for (let i = 0; i < res.length; i++) {
+                        const items = res[i];
+                        choiceArr.push(`${items.employeeFirst} ${items.employeeLast} | EmployeeID:${items.id}`)
+                    }
+                    return choiceArr;
+                }
+            },
+            {
+                name: "roleChange",
+                type: "rawlist",
+                message: "Which role are they changing to?",
+                choices: () => {
+                    let optionsArr = [];
+                    for (let j = 0; j < response.length; j++) {
+                        const roles = response[j];
+                        optionsArr.push(`${roles.title} | Role Id:${roles.id}`)
+                    }
+                    return optionsArr;
+                }     
+            }
+        ])
+        .then((answer) => {
+
+            const splitArr = answer.employeePick.split(":");
+            const employeeID = splitArr[1];
+
+            const splitRole = answer.roleChange.split(":");
+            const roleID = parseInt(splitRole[1]);
+            
+            connection.query(
+                `SELECT employee.id, employee.first_name AS employeeFirst, employee.last_name AS employeeLast, employee.role_id, role.title FROM employee INNER JOIN role ON role.id = employee.role_id WHERE employee.id = ${employeeID.toString()}; `, (err2,res2) => {
+                if (err2) throw err2;
+
+                let newRole;
+
+                if (res2[0].role_id === roleID) {
+                    console.log("They are already this role. Please choose another.");
+                    editEmployeeRole();
+                } else {
+                    newRole = roleID;
+
+                    connection.query("UPDATE companyStructure_DB.employee SET ? WHERE ?",
+                    [
+                        {
+                            role_id: newRole,
+                        },
+                        {
+                            id: employeeID,
+                        }
+                    ],
+                    (error) => {
+                        if (error) throw error;
+                        console.log("Employee's role has been updated!");
+                        startApp();
+                    })
+                }
+            })
+
+        })
+        })
+    })
+    
 }
