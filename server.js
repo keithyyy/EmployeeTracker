@@ -66,3 +66,54 @@ const startApp = () => {
             }
         })
 }
+
+const viewAllEmployees = () => {
+    let query = "SELECT employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.manager_first, manager.manager_last) AS manager ";
+        query += "FROM department INNER JOIN role ON role.department_id = department.id ";
+        query += "INNER JOIN employee ON employee.role_id = role.id ";
+        query += "LEFT JOIN manager ON manager.id = employee.manager_id;";
+
+    connection.query(query,(err,res) => {
+        if (err) throw err;
+        console.log("-------------------------");
+        console.table(res);
+        console.log("-------------------------")
+        console.log("What's next?");
+        startApp();
+    })
+}
+
+
+const viewByDeparment = () => {
+    let query = "SELECT employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.manager_first, manager.manager_last) AS manager ";
+    query += "FROM department INNER JOIN role ON role.department_id = department.id ";
+    query += "INNER JOIN employee ON employee.role_id = role.id ";
+    query += "LEFT JOIN manager ON manager.id = employee.manager_id ";
+    query += "ORDER BY department.name ASC";
+
+    connection.query(query, (err,res) => {
+        if (err) throw err;
+        console.log("-------------------------");
+        console.table(res);
+        console.log("-------------------------")
+        console.log("What's next?");
+        startApp();
+    })
+}
+
+const viewByManager = () => {
+    let query = "SELECT employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.manager_first, manager.manager_last) AS manager ";
+    query += "FROM department INNER JOIN role ON role.department_id = department.id ";
+    query += "INNER JOIN employee ON employee.role_id = role.id ";
+    query += "INNER JOIN manager ON manager.id = employee.manager_id ";
+    query += "ORDER BY manager.manager_first ASC";
+
+    connection.query(query, (err,res) => {
+        if (err) throw err;
+        console.log("-------------------------");
+        console.table(res);
+        console.log("-------------------------")
+        console.log("What's next?");
+        startApp();
+    })
+}
