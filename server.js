@@ -68,20 +68,29 @@ const startApp = () => {
 }
 
 const viewAllEmployees = () => {
-    let query = "SELECT employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.manager_first, manager.manager_last) AS manager ";
-        query += "FROM department INNER JOIN role ON role.department_id = department.id ";
-        query += "INNER JOIN employee ON employee.role_id = role.id ";
-        query += "LEFT JOIN manager ON manager.id = employee.manager_id;";
-
-    connection.query(query,(err,res) => {
+    let sql = "SELECT * FROM employee;";
+    connection.query(sql, (err, res) => {
         if (err) throw err;
-        console.log("-------------------------");
         console.table(res);
-        console.log("-------------------------")
-        console.log("What's next?");
-        startApp();
+        startApp()
     })
 }
+
+// const viewAllEmployees = () => {
+//     let query = "SELECT employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.manager_first, manager.manager_last) AS manager ";
+//         query += "FROM department INNER JOIN role ON role.department_id = department.id ";
+//         query += "INNER JOIN employee ON employee.role_id = role.id ";
+//         query += "LEFT JOIN manager ON manager.id = employee.manager_id;";
+
+//     connection.query(query,(err,res) => {
+//         if (err) throw err;
+//         console.log("-------------------------");
+//         console.table(res);
+//         console.log("-------------------------")
+//         console.log("What's next?");
+//         startApp();
+//     })
+// }
 
 
 const viewByDeparment = () => {
@@ -198,3 +207,85 @@ const editEmployeeRole = () => {
     })
     
 }
+
+
+const addEmployee = () => {
+    let roles = {
+        id: [],
+        title: [],
+    };
+    let sql = "SELECT * FROM role;";
+    connection.query(sql, (err,res) => {
+        if (err) throw err;
+        for (value of res) {
+            roles.id.push(value.id);
+            roles.title.push(value.title);
+        }
+    });
+
+    let employees = {
+        id: [],
+        name: [],
+    }
+
+    let sql2 = "SELECT * FROM employee;";
+    connection.query(sql2, (err, res) =>{
+        if (err) throw err;
+        for (emp of res) {
+            employees.name.push(emp.first_name + " " + emp.last_name);
+            employees.id.push(emp.id);
+        }
+        employees.name.push("None");
+        employees.id.push(0);
+    });
+
+    inquirer.prompt([
+        {
+            name: "EmpFirst",
+            type: "input",
+            message: "Enter their first name:"
+        },
+        {
+            name: "EmpLast",
+            type: "input",
+            message: "Enter their last name:"
+        }])
+        .then((answer) => {
+            let firstName = answer.EmpFirst;
+            let lastName= answer.EmpLast;
+
+            inquirer.prompt({
+                name: "role",
+                type: "list",
+                message: "What's their role?",
+                choices: roles.title,
+            }).then((response) => {
+                let index = roles.title.indexOf(response.role);
+                let role_id = roles.id[index];
+
+                inquirer.prompt({
+                    name: "manager",
+                    type: "list",
+                    message: "Who do they report to?",
+                    choices: employees.name
+                })
+                .then((ans) => {
+                    let index = employees.name.indexOf(ans.manager);
+                    let manager_id = employees.id[index];
+                    let sql = `INSERT INTO employee (role_id, first_name, last_name, manager_id) VALUES ("${role_id}", "${firstName}", "${lastName}", "${manager_id}");`;
+                    if (index === employees.name.length - 1) {
+                        sql = `INSERT INTO employee (role_id, first_name, last_name) VALUES ("${role_id}", "${firstName}", "${lastName}")`;
+                    }
+                    connection.query(sql, (err, res) => {
+                        if (err) throw err;
+                        console.log("Employee added!");
+                        startApp();
+                    })
+                })
+            })
+        })
+
+    
+}
+
+
