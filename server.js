@@ -288,4 +288,34 @@ const addEmployee = () => {
     
 }
 
+const removeEmployee = () => {
+    let employees = {
+        id: [],
+        name: [],
+    }   
+    let sql = "SELECT * FROM employee";
+    connection.query(sql, (err, res) => {
+        if (err) throw err;
+        for (emp of res) {
+            employees.id.push(emp.id);
+            employees.name.push(emp.first_name + " " + emp.last_name)
+        }
+        inquirer.prompt({
+            name: "name",
+            type: "list",
+            message: "Who would you like to remove?",
+            choices: employees.name
+        })
+        .then((response) => {
+            let index = employees.name.indexOf(response.name);
+            let id = employees.id[index];
+            let sql = `DELETE FROM employee WHERE id=${id};`;
+            connection.query(sql, (err) => {
+                if (err) throw err;
+                console.log("Employee has been deleted.")
+                startApp();
+            })
+        })
+    })
+}
 
