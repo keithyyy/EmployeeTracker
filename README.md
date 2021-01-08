@@ -13,3 +13,4 @@ A schema.sql is used to create the database in MySQL, while the seed.sql is used
 
 
 **Here's a gif of navigating the database through the CLI:**
+![EmployeeTracker_gif](EmployeeTracker.gif)
